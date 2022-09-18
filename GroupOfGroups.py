@@ -1,4 +1,5 @@
 from re import M
+from tokenize import group
 from unicodedata import name
 from Group import Group
 
@@ -54,6 +55,19 @@ class Groups:
             print(f"Deleted {name_group}")
         else:
             print("Group does not exist.")
+    
+    def add_to_group(self,group_name,link_name,link):
+        
+        if group_name in self.groups:
+            self.groups[group_name].add(link_name,link)
+        else:
+            print("Group doesn't exist!")
+
+    def remove_from_group(self,group_name,link_name):
+        if group_name in self.groups:
+            self.groups[group_name].remove(link_name)
+        else:
+            print("Group doesn't exist")
         
 
 
@@ -73,4 +87,9 @@ if __name__ == "__main__":
     print(m)   
     m.groups["Marvel"].remove("Robot")
     m.groups["DC"].remove("Batman")
+    print(m)
+
+    m.add_to_group("Marvel","Virenn","Virenn")
+    m.remove_from_group("DC","Batman")
+
     print(m)
