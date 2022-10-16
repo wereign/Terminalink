@@ -26,9 +26,7 @@ This a python tool that let's you update a Notion Table from your command line.
     python list-links
     ```
 
-3. add-link - Adds a row to your notion database
-<br>
-Parameters
+3. add-link - Adds a row to your notion database. Add the following parameters
 -  name - the title for your row.
 - link - link to the interesting article/ webpage of choice.
     
