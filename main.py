@@ -1,58 +1,113 @@
+from unicodedata import name
 import typer
-from Groups import Groups
-# CONSUMER_KEY = "103842-89aabf8bd8094760d81d63b"
+import requests
+import json
+
 app = typer.Typer()        
 
 
-articles_repo = Groups()
+# NOTION PARAMETERS
+db_id = "c39f07940a4b4e9381bd21dbbae87e02"
+token = "secret_fNYjq1G7Z2YsiQBZAtwZDnWEM4xFjZwF9QzMD0UcV6I"
+headers = {
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json",
+    "Notion-Version": "2022-06-28"
+}
 
-SELECTED_GROUP = ""
 @app.command()
 def hello():
     print("Hello")
 
-@app.command()
-def list_groups():
-    print(articles_repo)
-    
+
+def list_groups(databaseId=db_id, headers=headers):
+    readUrl = f"https://api.notion.com/v1/databases/{databaseId}/query"
+
+    res = requests.request("POST", readUrl, headers=headers)
+    data = res.json()
+    # print(res.status_code)
+
+    pages = data["results"]
+    for page in pages:
+        print(page['properties']['Link']['rich_text'][0]['text']['content'])
+        print(page['properties']['Name']['title'][0]['text']['content'])
+
+
+
+
+
+
+def add_link_function(name_row,link_row,databaseId=db_id, headers=headers):
+
+    create_url = "https://api.notion.com/v1/pages"
+
+    new_page_data = {
+        "parent": { "database_id": databaseId},
+            "properties": {
+                "Link": {
+                    "type": "rich_text",
+                    "rich_text": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": link_row,
+                                "link": {
+                                    "url": link_row
+                                }
+                            },
+                            "annotations": {
+                                "bold": False,
+                                "italic": False,
+                                "strikethrough": False,
+                                "underline": False,
+                                "code": False,
+                                "color": "default"
+                            },
+                            "plain_text": link_row,
+                            "href": link_row
+                        }
+                    ]
+                },
+                "Name": {
+                    "id": "title",
+                    "type": "title",
+                    "title": [
+                        {
+                            "type": "text",
+                            "text": {
+                                "content": name_row,
+                            },
+                            "annotations": {
+                                "bold": False,
+                                "italic": False,
+                                "strikethrough": False,
+                                "underline": False,
+                                "code": False,
+                                "color": "default"
+                            },
+                            "plain_text": name_row,
+                        }
+                    ]
+                }
+            },
+        }
+
+    data = json.dumps(new_page_data)
+
+
+    res = requests.request("POST",create_url,headers=headers,data=data)
+    print(res.status_code)
+
 
 @app.command()
-def add_group(name:str):
-    articles_repo.add(name)
-    # print(articles_repo)
-
-@app.command()
-def remove_group(name:str):
-    articles_repo.remove(name)
-
-@app.command()
-def select_group(name:str):
-    global SELECTED_GROUP
-    print(articles_repo.groups)
-    if name in articles_repo.groups:
-        SELECTED_GROUP = name
-        print(f"Selected Group: {name}")
-    else:
-        print("Group doesn't exist")
-
-@app.command()
-def list_articles():
-    print(articles_repo.groups[SELECTED_GROUP])
-
-@app.command()
-def add_article(article_name:str,link:str):
-    articles_repo.add_to_group(SELECTED_GROUP,article_name,link)
+def list_links():
+    list_groups()
 
 
 @app.command()
-def remove_article(article_name:str):
-    articles_repo.remove_from_group(SELECTED_GROUP,article_name)
-
-@app.command()
-def remove_all_articles():
-    articles_repo.groups[SELECTED_GROUP]
-
-
+def add_link(name_row,link_row):
+    print(f"Adding {name_row} with link {link_row}")
+    add_link_function(name_row,link_row)
 
 if __name__ == "__main__":
     app()
