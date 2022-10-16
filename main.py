@@ -8,7 +8,7 @@ app = typer.Typer()
 
 # NOTION PARAMETERS
 db_id = "c39f07940a4b4e9381bd21dbbae87e02"
-token = "secret_fNYjq1G7Z2YsiQBZAtwZDnWEM4xFjZwF9QzMD0UcV6I"
+token = ""
 headers = {
     "Authorization": "Bearer " + token,
     "Content-Type": "application/json",
